@@ -109,8 +109,24 @@ public class UserController {
      * @param user
      * @return
      */
-    @RequestMapping(value = "/register")
+    @GetMapping(value = "/register")
     public String register() {
+        return "register";
+    }
+
+    @PostMapping(value = "/registerUser")
+    public String registerUser(User user, Model model) {
+        User uu = userDao.queryUserByUsername(user.getUsername());
+        String msg = "注册成功。";
+        if (null == uu) {
+            userDao.insertUser(user);
+            User u1 = userDao.queryUserByUsername(user.getUsername());
+            userRoleRelationDao.insert(String.valueOf(u1.getId()));
+            model.addAttribute("alert", msg);
+            return LOGIN;
+        }
+        msg = "用户名已存在";
+        model.addAttribute("alert", msg);
         return "register";
     }
 
@@ -137,9 +153,12 @@ public class UserController {
      */
     @ResponseBody
     @PostMapping("/user_delete")
-    public R delPatient(User user) {
-        userDao.deleteById(user);
-        return R.ok();
+    public R delPatient(User user, HttpSession session) {
+        if ("admin".equals(session.getAttribute(TOKEN))) {
+            userDao.deleteById(user);
+            return R.ok();
+        }
+        return R.error(401, "非法请求");
     }
 
     /**
@@ -187,18 +206,20 @@ public class UserController {
     public ModelAndView savePatient(User user, HttpSession httpSession) {
         if (httpSession.getAttribute(TOKEN) == null)
             return new ModelAndView(LOGIN);
-        User p = userDao.findById(user);
-        if (p == null) {
-            Date createtime = new Date();
-            user.setCreateTime(createtime);
-            userDao.insertUser(user);
-            User uu = userDao.queryUserByUsername(user.getUsername());
-            userRoleRelationDao.insert(String.valueOf(uu.getId()));
-            return new ModelAndView("redirect:user/login");
-        } else {
-            userDao.updateAll(user);
-            return new ModelAndView("redirect:user/user_list");
+        if ("admin".equals(httpSession.getAttribute(TOKEN))) {
+            User p = userDao.findById(user);
+            if (p == null) {
+                Date createtime = new Date();
+                user.setCreateTime(createtime);
+                userDao.insertUser(user);
+                User uu = userDao.queryUserByUsername(user.getUsername());
+                userRoleRelationDao.insert(String.valueOf(uu.getId()));
+                return new ModelAndView("redirect:/user/login");
+            } else {
+                userDao.updateAll(user);
+                return new ModelAndView("redirect:/user/user_list");
+            }
         }
+        return new ModelAndView("redirect:/user/user_list");
     }
-
 }
