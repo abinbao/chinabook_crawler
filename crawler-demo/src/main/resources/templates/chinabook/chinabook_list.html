@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>数据采集系统</title>
+
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
+<link th:href="@{/font-awesome/css/font-awesome.css}" rel="stylesheet" />
+<link th:href="@{/css/style.css}" rel="stylesheet" />
+
+<link th:href="@{/css/plugins/iCheck/custom.css}" rel="stylesheet"/>
+<link th:href="@{/css/plugins/footable/footable.core.css}" rel="stylesheet"/>
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+		<nav class="navbar-default navbar-static-side" role="navigation" th:include="nav :: navigation"></nav>
+		<div id="page-wrapper" class="gray-bg">
+        	<div class="border-bottom" th:include="header :: headerTop"></div>
+      		<div class="row wrapper border-bottom white-bg page-heading" th:fragment="headerNav">
+		   		<div class="col-lg-10">
+		     		<h2>数据管理</h2>
+		          	<ol class="breadcrumb">
+			            <li>
+			            	<a href="#">首页</a>
+			            </li>
+			            <li>
+			            	<a>数据管理</a>
+			         	</li>
+			          	<li class="active">
+			             	<strong>数据管理</strong>
+			          	</li>
+					</ol>
+		      	</div>
+		      	<div class="col-lg-2">
+		      	</div>
+		  	</div>
+		  	
+        	<div class="wrapper wrapper-content animated fadeInRight">
+            	<div class="row">
+                	<div class="col-lg-12">
+	                    <div class="ibox float-e-margins">
+	                        <div class="ibox-title">
+	                            <h5>数据信息列表</h5>
+	                            <div class="ibox-tools">
+	                                <a class="collapse-link">
+	                                    <i class="fa fa-chevron-up"></i>
+	                                </a>
+	                            </div>
+	                        </div>
+	                        <div class="ibox-content">
+	                            <div class="table-responsive">
+	                                <table class=" table table-hover" data-page-size="10">
+	                                    <thead>
+		                                    <tr>
+		                                    	<th width="30%">书名</th>
+		                                        <th width="30%">作者</th>
+		                                        <th width="5%">出售价格</th>
+		                                        <th width="5%">折扣</th>
+    		                                        <th width="5%">原价</th>
+    		                                        <th >类别1</th>
+    		                                        <th >类别2</th>
+    		                                        <th>操作</th>
+		                                        <th>操作</th>
+		                                    </tr>
+	                                    </thead>
+	                                    <tbody>
+	                                    	<tr th:each="book : ${books}">
+										   		<td th:text="${book.bookName}">Onions</td>
+										      	<td th:text="${book.authorInfo}">Onions</td>
+										      	<td th:text="${book.sellPrice}">Onions</td>
+										      	<td th:text="${book.discount}">Onions</td>
+										      	<td th:text="${book.priceTit}">Onions</td>
+										      	<td th:text="${book.category1}">Onions</td>
+										      	<td th:text="${book.category2}">Onions</td>
+										      	<td><a th:href="'chinabook_info_'+${book.id}">查看</a></td>
+									      		<td>
+										      		<a href="#" th:onclick="'javascript:updateState('+${book.id}+',2);'" title="删除"><i class="fa fa-trash-o text-navy"></i></a>
+										      	</td>
+											</tr>
+	                                    </tbody>
+	                                   	<tfoot>
+			                                <tr>
+			                                    <td colspan="7">
+			                                        <ul id="pageHTML" class="pagination pull-right"></ul>
+			                                    </td>
+			                                </tr>
+		                                </tfoot>
+	                                </table>
+			                	</div>
+	                        </div>
+	           			</div>
+                	</div>
+            	</div>
+        	</div>
+        	<div class="footer" th:include="footer :: copyright"></div>
+      	</div>
+	</div>
+	
+    <!-- Mainly scripts -->
+    <script th:src="@{/js/jquery-2.1.1.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+    <script th:src="@{/js/plugins/metisMenu/jquery.metisMenu.js}"></script>
+    <script th:src="@{/js/plugins/slimscroll/jquery.slimscroll.min.js}"></script>
+	
+    <!-- Peity -->
+    <script th:src="@{/js/plugins/peity/jquery.peity.min.js}"></script>
+	
+    <!-- Custom and plugin javascript -->
+    <script th:src="@{/js/inspinia.js}"></script>
+    <script th:src="@{/js/plugins/pace/pace.min.js}"></script>
+	
+    <!-- iCheck -->
+    <script th:src="@{/js/plugins/iCheck/icheck.min.js}"></script>
+	
+    <!-- Peity -->
+    <script th:src="@{/js/demo/peity-demo.js}"></script>
+	
+	<!-- FooTable -->
+    <script th:src="@{/js/plugins/footable/footable.all.min.js}"></script>
+    
+    <!-- common -->
+    <script th:src="@{/js/common.js}"></script>
+
+    <script th:inline="javascript">
+	    var pageHTML = [[${pageHTML}]];
+		$(document).ready(function () {
+			$("#pageHTML").html(pageHTML);
+		});
+		
+		// 删除
+    	/*<![CDATA[*/
+		function updateState(id,state){
+    		var deleteTag;
+    		if(state==2){
+    			deleteTag = confirm("确定删除此条信息?");
+    		} else {
+    			deleteTag = true;
+    		}
+			if(deleteTag){
+		 		$.ajax({
+		      		type: "POST",
+		           	url: "book_delete?id="+id,
+		           	contentType: "application/json; charset=utf-8",
+		        	success: function(msg){
+		        		 window.location.reload();
+		       		},
+		     		error: function(){
+		     			alert("系统异常！");
+		       		}
+				});
+			}
+		}
+		/*]]>*/
+    </script>
+
+</body>
+
+</html>

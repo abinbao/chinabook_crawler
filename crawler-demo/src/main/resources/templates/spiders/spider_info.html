@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>数据采集系统</title>
+
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
+<link th:href="@{/font-awesome/css/font-awesome.css}" rel="stylesheet" />
+
+<!-- Toastr style -->
+<link th:href="@{/css/plugins/toastr/toastr.min.css}" rel="stylesheet" />
+
+<link th:href="@{/css/style.css}" rel="stylesheet" />
+
+<!-- summernote style -->
+<link th:href="@{/css/plugins/summernote/summernote.css}"
+	rel="stylesheet" />
+<link th:href="@{/css/plugins/summernote/summernote-bs3.css}"
+	rel="stylesheet" />
+
+<link th:href="@{/css/plugins/footable/footable.core.css}"
+	rel="stylesheet" />
+
+</head>
+
+<body>
+
+	<div id="wrapper">
+		<nav class="navbar-default navbar-static-side" role="navigation"
+			th:include="nav :: navigation"></nav>
+		<div id="page-wrapper" class="gray-bg">
+			<div class="border-bottom" th:include="header :: headerTop"></div>
+			<div class="row wrapper border-bottom white-bg page-heading"
+				th:fragment="headerNav">
+				<div class="col-lg-10">
+					<h2>爬虫管理</h2>
+					<ol class="breadcrumb">
+						<li><a href="#">首页</a></li>
+						<li><a>爬虫管理</a></li>
+					</ol>
+				</div>
+				<div class="col-lg-2"></div>
+			</div>
+			<div class="wrapper wrapper-content animated fadeInRight">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="ibox float-e-margins">
+							<div class="ibox-title">
+								<h5>爬虫信息</h5>
+							</div>
+							<div class="ibox-content">
+								<table class="table">
+		                            <thead>
+		                            <tr>
+		                                <th>爬虫名称</th>
+		                                <th>爬虫状态</th>
+		                                <th>爬虫描述</th>
+		                                <th>创建时间</th>
+		                                <th>更新时间</th>
+		                                <th>操作</th>
+		                                <th>操作</th>
+		                            </tr>
+		                            </thead>
+		                            <tbody>
+		                            <tr>
+		                                <td th:text="${spiderInfo.spiderName}">Mark</td>
+		                                <td id="status"></td>
+		                                <td th:text="${spiderInfo.spiderDescription}">@mdo</td>
+		                                <td th:text="${#dates.format(spiderInfo.insertTime,'yyyy-MM-dd HH:mm:ss')}">@mdo</td>
+		                                <td th:text="${#dates.format(spiderInfo.createTime,'yyyy-MM-dd HH:mm:ss')}">@mdo</td>
+		                                <td id="btn1"></td>
+		                                <td><span th:onclick="'javascript:count(\''+${spiderInfo.spiderName}+'\');'" class="label label-primary">刷新运行状态</span></td>
+		                            </tr>
+		                            </tbody>
+	                        		</table>
+							</div>
+						</div>
+					</div>
+				</div>
+            		<div class="row">
+            			<div class="col-lg-6">
+                    <div class="ibox float-e-margins">
+                		<div class="ibox-title">
+						<h5>中国图书网爬虫监控</h5>
+					</div>
+                        <div class="ibox-content">
+							<div id="chartmain" style="width:600px; height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+              	<div class="col-lg-6">
+                <div class="ibox float-e-margins">
+                		<div class="ibox-title">
+						<h5>中国图书网爬虫监控</h5>
+					</div>
+                    <div class="ibox-content">
+                        <div id="chartline" style="width:500px; height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+                </div>
+            </div>
+			<div class="footer" th:include="footer :: copyright"></div>
+		</div>
+	</div>
+
+	<!-- Mainly scripts -->
+	<script th:src="@{/js/jquery-2.1.1.js}"></script>
+	<script th:src="@{/js/bootstrap.min.js}"></script>
+	<script th:src="@{/js/plugins/metisMenu/jquery.metisMenu.js}"></script>
+	<script th:src="@{/js/plugins/slimscroll/jquery.slimscroll.min.js}"></script>
+
+	<!-- Peity -->
+	<script th:src="@{/js/plugins/peity/jquery.peity.min.js}"></script>
+
+	<!-- Custom and plugin javascript -->
+	<script th:src="@{/js/inspinia.js}"></script>
+	<script th:src="@{/js/plugins/pace/pace.min.js}"></script>
+
+	<!-- Toastr script -->
+	<script th:src="@{/js/plugins/toastr/toastr.min.js}"></script>
+
+	<!-- common -->
+	<script th:src="@{/js/common.js}"></script>
+    <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min.js"></script>
+    
+	<!-- SUMMERNOTE -->
+	<script th:src="@{/js/plugins/summernote/summernote.min.js}"></script>
+	<script th:inline="javascript" type="text/javascript">
+		// 查看爬虫状态
+		function queryStatus() {
+			$.ajax({
+		      		type: "GET",
+		           	url: "query",
+		           	contentType: "application/json; charset=utf-8",
+		        		success: function(msg){
+						if(msg.code == '0'){
+							if(msg.result.spiderStatus == 'STOP') {
+								$("#status").html('<td><span class="label label-danger">等待中</span></td>');
+								$("#btn1").html('<td><span  th:onclick="'javascript:run(\''+${spiderInfo.spiderName}+'\');'" class="label label-primary">启动</span></td>');
+							} else {
+								$("#status").html('<td><span class="label label-primary">运行中</span></td>');
+								$("#btn1").html('<td><span  th:onclick="'javascript:stop(\''+${spiderInfo.spiderName}+'\');'" class="label label-danger">停止</span></td>');
+							}
+						}
+		       		},
+		     		error: function(){
+		     			alert("系统异常！");
+		       		}
+			});
+		}
+	
+		// 页面加载时执行
+		$(document).ready(function () {
+			queryStatus();
+			count("chinabook");
+		});
+		// 
+		function paint_bar(result) {
+			var option={
+		        //定义一个标题
+		        title:{
+		            text:'中国图书网爬虫运行状况'
+		        },
+		        legend:{
+		            data:['请求数量']
+		        },
+		        //X轴设置
+		        xAxis:{
+		        		name: '状态',
+		            data:['等待中','运行中','已结束','总请求数']
+		        },
+		        yAxis:{
+		        		name: '请求数量',
+		        },
+		        //name=legend.data的时候才能显示图例
+		        series:[{
+		            type:'bar',
+		            data:[result['init'],result['ing'],result['stop'],result['init']+result['ing']+result['stop']]
+		        }]
+		
+		    };
+	        //初始化echarts实例
+	        var myChart = echarts.init(document.getElementById('chartmain'));
+	        //使用制定的配置项和数据显示图表
+	        myChart.setOption(option);
+		}
+		
+		function paint_line(initList,ingList,stopList,timeList) {
+			option = {
+			    title: {
+			        text: ''
+			    },
+			    tooltip: {
+			        trigger: 'axis'
+			    },
+			    legend: {
+			        data:['等待中','运行中', '已停止']
+			    },
+			    grid: {
+			        left: '3%',
+			        right: '4%',
+			        bottom: '3%',
+			        containLabel: true
+			    },
+			    toolbox: {
+			        feature: {
+			            saveAsImage: {}
+			        }
+			    },
+			    xAxis: {
+			        type: 'category',
+			        boundaryGap: false,
+			        data: timeList
+			    },
+			    yAxis: {
+			    		name: '请求数量',
+			        type: 'value'
+			    },
+			    series: [
+			        {
+			            name:'等待中',
+			            type:'line',
+			            stack: '总量',
+			            data:initList
+			        },
+			        {
+			            name:'运行中',
+			            type:'line',
+			            stack: '总量',
+			            data:ingList
+			        },
+			        {
+			            name:'已停止',
+			            type:'line',
+			            stack: '总量',
+			            data:stopList
+			        }
+			    ]
+			};
+			//初始化echarts实例
+	        var myChart = echarts.init(document.getElementById('chartline'));
+	        //使用制定的配置项和数据显示图表
+	        myChart.setOption(option);
+		}
+		
+		// 查看爬虫运行状况
+		function count(spidername) {
+			monitor(spidername)
+			var data;
+			$.ajax({
+		      		type: "GET",
+		           	url: "count?spidername="+spidername,
+		           	contentType: "application/json; charset=utf-8",
+		        		success: function(msg){
+		        			if(msg.code == '0')	{
+		        				paint_bar(msg.result)
+		        			}
+		       		},
+		     		error: function(){
+		     			alert("系统异常！");
+		       		}
+				});
+			return data;
+		}
+		
+		// 查看爬虫运行状况
+		function monitor(spidername) {
+			$.ajax({
+		      		type: "GET",
+		           	url: "monitor?spidername="+spidername,
+		           	contentType: "application/json; charset=utf-8",
+		        		success: function(msg){
+		        			if(msg.code == '0')	{
+		        				var result = msg.result;
+		        				initList = [];
+		        				ingList = [];
+		        				stopList = [];
+		        				timeList = [];
+		        				for (var i = result.length-1; i>=0 ; i--) {
+		        					initList.push(result[i].spiderInitCount);
+		        					ingList.push(result[i].spiderIngCount);
+		        					stopList.push(result[i].spiderStopCount);
+		        					timeList.push(result[i].hour);
+		        				}
+		        				paint_line(initList,ingList,stopList,timeList);
+		        			}
+		       		},
+		     		error: function(){
+		     			alert("系统异常！");
+		       		}
+				});
+		}
+		
+		// 运行爬虫
+		function run(spidername) {
+			$.ajax({
+		      		type: "GET",
+		           	url: "run?spidername="+spidername,
+		           	contentType: "application/json; charset=utf-8",
+		        		success: function(msg){
+		        			if(msg.code == '0')	{
+		        				alert("运行成功。");
+		        				queryStatus();
+		        			}
+		       		},
+		     		error: function(){
+		     			alert("系统异常！");
+		       		}
+				});
+		}
+		
+		// 终止爬虫
+		function stop(spidername) {
+			$.ajax({
+		      		type: "GET",
+		           	url: "close?spidername="+spidername,
+		           	contentType: "application/json; charset=utf-8",
+		        		success: function(msg){
+		        			alert("终止成功。");
+		        			queryStatus();
+		       		},
+		     		error: function(){
+		     			alert("系统异常！");
+		       		}
+				});
+		}
+		
+		
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>数据采集系统</title>
+
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
+<link th:href="@{/font-awesome/css/font-awesome.css}" rel="stylesheet" />
+<!-- Toastr style -->
+<link th:href="@{/css/plugins/toastr/toastr.min.css}" rel="stylesheet" />
+
+<link th:href="@{/css/style.css}" rel="stylesheet" />
+
+<!-- summernote style -->
+<link th:href="@{/css/plugins/summernote/summernote.css}"
+	rel="stylesheet" />
+<link th:href="@{/css/plugins/summernote/summernote-bs3.css}"
+	rel="stylesheet" />
+
+<link th:href="@{/css/plugins/footable/footable.core.css}"
+	rel="stylesheet" />
+
+</head>
+
+<body>
+
+	<div id="wrapper">
+		<nav class="navbar-default navbar-static-side" role="navigation"
+			th:include="nav :: navigation"></nav>
+		<div id="page-wrapper" class="gray-bg">
+			<div class="border-bottom" th:include="header :: headerTop"></div>
+			<div class="row wrapper border-bottom white-bg page-heading"
+				th:fragment="headerNav">
+				<div class="col-lg-10">
+					<h2>数据管理</h2>
+					<ol class="breadcrumb">
+						<li><a href="#">首页</a></li>
+						<li><a>数据管理</a></li>
+					</ol>
+				</div>
+				<div class="col-lg-2"></div>
+			</div>
+			<div class="wrapper wrapper-content animated fadeInRight">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="ibox float-e-margins">
+							<div class="ibox-title">
+								<h5>中国图书网详细信息</h5>
+							</div>
+							<div class="ibox-content">
+								<div class="table-responsive">
+		                               <div class="wrapper wrapper-content">
+            <div class="row">
+                <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5 th:text="${book.bookName}">Grid options</h5>
+                    </div>
+                    <div class="ibox-content">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped">
+                                    <tbody>
+                                    <tr>
+                                        <th colspan="1">书名</th>
+                                        <td colspan="2" th:text="${book.bookName}"></td>
+                                        <th colspan="1">作者信息</th>
+                                        <td colspan="2" th:text="${book.authorInfo}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="1">出版社</th>
+                                        <td colspan="1" th:text="${book.publisher}"></td>
+                                        <th colspan="1">出版时间</th>
+                                        <td colspan="1" th:text="${book.publishTime}"></td>
+                                         <th>类别1</th>
+                                        <td th:text="${book.category1}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>售价</th>
+                                        <td th:text="${book.sellPrice} + ' 元'"></td>
+                                        <th>折扣</th>
+                                        <td th:text="${book.discount} + ' 折'"></td>
+                                        <th>原价</th>
+                                        <td th:text="${book.priceTit} + ' 元'"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>类别2</th>
+                                        <td th:text="${book.category2}"></td>
+                                        <th>创建时间</th>
+                                        <td th:text="${#dates.format(book.insertTime,'yyyy-MM-dd HH:mm:ss')}"></td>
+                                        <th>更新时间</th>
+                                        <td th:text="${#dates.format(book.updateTime,'yyyy-MM-dd HH:mm:ss')}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="1">详细链接地址</th>
+                                        <td colspan="2" th:text="${book.detailUrl}"></td>
+                                        <th colspan="1">图片链接地址</th>
+                                        <td colspan="2" th:text="${book.imageUrl}"></td>
+                                    </tr>
+                                    <tr>
+                                    	  <th colspan="2">摘要信息</th>
+                                    	  <td colspan="4" th:text="${book.recolagu}"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                 <div>
+                    					<iframe width="100%" height="500px" id="iframe" th:src="${book.detailUrl}"  />
+                    				</div>
+                            </div>
+                    </div>
+                   
+                </div>
+            </div>
+            </div>
+            </div>
+				                	</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<div class="footer" th:include="footer :: copyright"></div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+	</script>
+
+	<!-- Mainly scripts -->
+	<script th:src="@{/js/jquery-2.1.1.js}"></script>
+	<script th:src="@{/js/bootstrap.min.js}"></script>
+	<script th:src="@{/js/plugins/metisMenu/jquery.metisMenu.js}"></script>
+	<script th:src="@{/js/plugins/slimscroll/jquery.slimscroll.min.js}"></script>
+
+	<!-- Peity -->
+	<script th:src="@{/js/plugins/peity/jquery.peity.min.js}"></script>
+
+	<!-- Custom and plugin javascript -->
+	<script th:src="@{/js/inspinia.js}"></script>
+	<script th:src="@{/js/plugins/pace/pace.min.js}"></script>
+
+	<!-- Toastr script -->
+	<script th:src="@{/js/plugins/toastr/toastr.min.js}"></script>
+
+	<!-- common -->
+	<script th:src="@{/js/common.js}"></script>
+
+	<!-- SUMMERNOTE -->
+	<script th:src="@{/js/plugins/summernote/summernote.min.js}"></script>
+
+</body>
+
+</html>

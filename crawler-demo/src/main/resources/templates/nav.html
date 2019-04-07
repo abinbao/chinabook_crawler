@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8"/>
+<title>Insert title here</title>
+</head>
+<body>
+	<nav class="navbar-default navbar-static-side" role="navigation" th:fragment="navigation">
+        <div class="sidebar-collapse">
+            <ul class="nav metismenu" id="side-menu">
+                <li class="nav-header">
+                    <div class="dropdown profile-element"> 
+                    	<a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                            <span class="clear"> 
+                            	<span class="block m-t-xs">
+                            		<strong th:text="${session.username}" class="font-bold"></strong>
+                             	</span> 
+                             </span>
+                     	</a>
+                    </div>
+                    <div class="logo-element">
+                        聚焦
+                    </div>
+                </li>
+                <li>
+                    <a th:href="@{/user/dashboard}"><i class="fa fa-diamond"></i> <span class="nav-label">工作台</span></a>
+                </li>
+                <li>
+                    <a th:href="@{'/user/user_info_' + ${session.username}}"><i class="fa fa-diamond"></i> <span class="nav-label">个人信息</span></a>
+                </li>
+                <!-- 用户管理 -->
+                 <li th:if="${session.username} == 'admin'" id="usermanger">
+                    <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">用户管理</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li id="user_list"><a th:href="@{/user/user_list}">用户列表</a></li>
+                    </ul>
+                </li>
+                <!-- 爬虫管理 -->
+                <li id="spider">
+                    <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">爬虫管理</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li id="spiders"><a th:href="@{/spider/spider_info}">爬虫信息</a></li>
+                    </ul>
+                </li>
+                <!-- 数据管理 -->
+                <li id="spider">
+                    <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">数据信息管理</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li id="spiders"><a th:href="@{/chinabook/chinabook_list_0_0_0}">数据信息列表</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</body>
+</html>
+
+
+
