@@ -3,6 +3,7 @@ package com.ye.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -81,4 +82,13 @@ public interface ChinaBookDao {
      */
     @Select("select * from china_book_info discount order by discount asc limit 10;")
     List<ChinaBookModel> getRankByDiscount();
+
+    /**
+     * 删除用户
+     * 
+     * @param patient
+     * @return
+     */
+    @Delete("delete from china_book_info where id = #{id}")
+    int deleteById(ChinaBookModel model);
 }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -133,6 +134,22 @@ public class ChinaBookController {
     @ResponseBody
     public R getRankByDiscount() {
         return R.ok().put("result", chinaBookDao.getRankByDiscount());
+    }
+
+    /**
+     * 删除用户
+     * 
+     * @param user
+     * @return
+     */
+    @ResponseBody
+    @PostMapping("/book_delete")
+    public R delChinabook(ChinaBookModel model, HttpSession session) {
+        if ("admin".equals(session.getAttribute(TOKEN))) {
+            chinaBookDao.deleteById(model);
+            return R.ok();
+        }
+        return R.error(401, "非法请求");
     }
 
 }
