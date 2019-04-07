@@ -96,7 +96,7 @@ public class UserController {
         }
         if (msg.equals("登录成功")) {
             session.setAttribute(TOKEN, uu.getUsername());
-            return "dashboard";
+            return "redirect:/user/dashboard";
         } else {
             model.addAttribute("error", msg);
             return LOGIN;
