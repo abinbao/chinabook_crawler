@@ -2,6 +2,8 @@ package com.ye.controller;
 
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpSession;
 
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import com.ye.constant.R;
 import com.ye.dao.ChinaBookDao;
@@ -203,23 +206,62 @@ public class UserController {
      * @return
      */
     @RequestMapping("/save_user")
-    public ModelAndView savePatient(User user, HttpSession httpSession) {
+    public ModelAndView savePatient(User user, RedirectAttributesModelMap model, HttpSession httpSession) {
         if (httpSession.getAttribute(TOKEN) == null)
             return new ModelAndView(LOGIN);
-        if ("admin".equals(httpSession.getAttribute(TOKEN))) {
-            User p = userDao.findById(user);
-            if (p == null) {
-                Date createtime = new Date();
-                user.setCreateTime(createtime);
-                userDao.insertUser(user);
-                User uu = userDao.queryUserByUsername(user.getUsername());
-                userRoleRelationDao.insert(String.valueOf(uu.getId()));
-                return new ModelAndView("redirect:/user/login");
-            } else {
-                userDao.updateAll(user);
-                return new ModelAndView("redirect:/user/user_list");
+        User p = userDao.findById(user);
+        if (p == null) {
+            Date createtime = new Date();
+            user.setCreateTime(createtime);
+            userDao.insertUser(user);
+            User uu = userDao.queryUserByUsername(user.getUsername());
+            userRoleRelationDao.insert(String.valueOf(uu.getId()));
+            return new ModelAndView("redirect:/user/login");
+        } else {
+
+            // 校验密码
+            if (StringUtils.isBlank(user.getPassword())) {
+                model.addFlashAttribute("passwordError", "密码不能为空");
+                return new ModelAndView("redirect:/user/user_info_" + user.getUsername());
             }
+            // 校验手机号
+            if (StringUtils.isNotBlank(user.getPhone())) {
+                String regex = "^((13[0-9])|(14[5,7,9])|(15([0-3]|[5-9]))|(166)|(17[0,1,3,5,6,7,8])|(18[0-9])|(19[8|9]))\\d{8}$";
+                Pattern pattern = Pattern.compile(regex);
+                Matcher m = pattern.matcher(user.getPhone());
+                if (!m.find()) {
+                    model.addFlashAttribute("phoneError", "请输入正确的手机号");
+                    return new ModelAndView("redirect:/user/user_info_" + user.getUsername());
+                }
+            }
+            // 校验年龄
+            if (StringUtils.isNotBlank(user.getAge())) {
+                String regex = "^\\d+$";
+                Pattern pattern = Pattern.compile(regex);
+                Matcher m = pattern.matcher(user.getAge());
+                if (!m.find()) {
+                    model.addFlashAttribute("ageError", "请输入正确的年龄");
+                    return new ModelAndView("redirect:/user/user_info_" + user.getUsername());
+                }
+            }
+            // 校验邮箱
+            if (StringUtils.isNotBlank(user.getEmail())) {
+                String regEx1 = "^([a-z0-9A-Z]+[-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$";
+                Pattern pp;
+                Matcher m;
+                pp = Pattern.compile(regEx1);
+                m = pp.matcher(user.getEmail());
+
+                if (!m.matches()) {
+                    model.addFlashAttribute("emailError", "请输入正确的邮箱");
+                    return new ModelAndView("redirect:/user/user_info_" + user.getUsername());
+                }
+            }
+            userDao.updateAll(user);
+            if (httpSession.getAttribute(TOKEN).equals(user.getUsername())) {
+                return new ModelAndView("redirect:/user/user_info_" + user.getUsername());
+            }
+            return new ModelAndView("redirect:/user/user_list");
         }
-        return new ModelAndView("redirect:/user/user_list");
     }
 }

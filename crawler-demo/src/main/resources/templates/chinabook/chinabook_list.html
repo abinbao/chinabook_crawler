@@ -25,16 +25,16 @@
         	<div class="border-bottom" th:include="header :: headerTop"></div>
       		<div class="row wrapper border-bottom white-bg page-heading" th:fragment="headerNav">
 		   		<div class="col-lg-10">
-		     		<h2>数据管理</h2>
+		     		<h2>数据信息管理</h2>
 		          	<ol class="breadcrumb">
 			            <li>
 			            	<a href="#">首页</a>
 			            </li>
 			            <li>
-			            	<a>数据管理</a>
+			            	<a>数据信息管理</a>
 			         	</li>
 			          	<li class="active">
-			             	<strong>数据管理</strong>
+			             	<strong>数据信息列表</strong>
 			          	</li>
 					</ol>
 		      	</div>
@@ -67,7 +67,7 @@
     		                                        <th >类别1</th>
     		                                        <th >类别2</th>
     		                                        <th>操作</th>
-		                                        <th>操作</th>
+		                                        <th th:if="${session.username} == 'admin'" >操作</th>
 		                                    </tr>
 	                                    </thead>
 	                                    <tbody>
@@ -80,7 +80,7 @@
 										      	<td th:text="${book.category1}">Onions</td>
 										      	<td th:text="${book.category2}">Onions</td>
 										      	<td><a th:href="'chinabook_info_'+${book.id}">查看</a></td>
-									      		<td>
+									      		<td th:if="${session.username} == 'admin'" >
 										      		<a href="#" th:onclick="'javascript:updateState('+${book.id}+',2);'" title="删除"><i class="fa fa-trash-o text-navy"></i></a>
 										      	</td>
 											</tr>
